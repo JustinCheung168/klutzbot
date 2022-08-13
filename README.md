@@ -1,3 +1,3 @@
-# roboklutz
-Discord bot for ???
+# klutzbot
 
+General purpose Discord bot
