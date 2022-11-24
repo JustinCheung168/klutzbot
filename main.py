@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 import sys
 import os
-import pydantic
 
 import discord
 from dotenv import load_dotenv
 
+import klutzbot.command_defs.message
+import klutzbot.command_defs.novalue
+import klutzbot.command_defs.react
+
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
+custom_emoji_names = {}
 
 load_dotenv()
 
@@ -21,7 +25,6 @@ def choose_token(cli_args: list[str]):
         token = "KLUTZBOT_TOKEN"
     return token
 
-
 @client.event
 async def on_ready():
     """
@@ -30,7 +33,7 @@ async def on_ready():
     print(f'{client.user.name} is connected to Discord!')
     for guild in client.guilds:
         print(f'Connected to {guild.name}')
-
+        custom_emoji_names[guild] = {emoji.name:emoji for emoji in guild.emojis}
 
 @client.event
 async def on_message(message: discord.Message):
@@ -39,47 +42,24 @@ async def on_message(message: discord.Message):
     """
     if message.author == client.user: #Immediately leave if this bot sent the message to prevent responses of bot to itself.
         return
+
+    # Shame Slackbot
+    if message.author.name == "YAGPDB.xyz":
+        await klutzbot.command_defs.novalue.shame_slackbot(message, client)
+    else:
+        await klutzbot.command_defs.novalue.novalue_react(message, client, custom_emoji_names[message.guild])
+
     if len(message.content) > 0:
         if (message.content[0] == "!"): #Command handling
-            await execute_command(message)
+            await klutzbot.command_defs.message.execute_command(message, client)
     elif (len(message.embeds) > 0): #Pure embed handling
-        embedded = message.embeds[0]
-
-
-async def execute_command(message: discord.Message):
-    # Interpret message as a command
-    channel = client.get_channel(message.channel.id)
-
-    message_split = message.content.split(" ")
-    command = message_split[0].lower()
-    if len(message_split) > 0:
-        args = message_split[1:]
-    else:
-        args = []
-    
-    # Interpret specific commands
-    say_cmd = "!say"
-    if (command == say_cmd) and (message.author.name == "klutz"):
-        await say(args, say_cmd, channel)
-
-async def say(args: list[str], say_cmd, channel):
-    if len(args) == 2:
-        target_channel = client.get_channel(int(args[0]))
-        host_message = args[1]
-        await target_channel.send(host_message)
-    else:
-        await channel.send(f"Need exactly two arguments: {say_cmd} <id of channel to send message to> <message>")
-
-
-
+        pass
 
 @client.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     """
     Actions to taken upon any react being added.
     """
-    pass
-
-
+    await klutzbot.command_defs.react.respond_to_react(payload, client)
 
 client.run(os.getenv(choose_token(sys.argv)))

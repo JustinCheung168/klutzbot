@@ -3,23 +3,7 @@
 
 
 #!/usr/bin/env python3
-import os
-import discord
-from discord.embeds import _EmptyEmbed
-from dotenv import load_dotenv
-# import command_defs.general as general
-# import command_defs.teatime as teatime
 
-intents = discord.Intents.all()
-client = discord.Client(intents=intents)
-
-class RoboKlutz():
-    def __init__(self):
-        pass
-
-    def setup_on_ready(self):
-        translator = general.Translator(client)
-    
 
 class Translator():
     def __init__(self, client):

@@ -1,4 +1,6 @@
+.gitignore
 .env
+*__pycache__*
 
 # for Mac
 .DS_Store
