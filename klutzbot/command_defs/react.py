@@ -24,12 +24,12 @@ async def respond_to_react(payload: discord.RawReactionActionEvent, client: disc
     """
     reac = React(payload, client)
 
-    if reac.reactor_name == "klutz":
-        await mirror_react(reac)
+    # if reac.reactor_name == "klutz":
+    #     await mirror_react(reac)
         
-async def mirror_react(reac: React):
-    target_message = await reac.message
-    await target_message.add_reaction(reac.react)
+# async def mirror_react(reac: React):
+#     target_message = await reac.message
+#     await target_message.add_reaction(reac.react)
 
 
 

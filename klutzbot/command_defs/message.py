@@ -42,10 +42,6 @@ async def execute_command(message: discord.Message, client: discord.Client):
         await _reply(cmd)
     if (cmd.command == "!react") and (cmd.author_name == "klutz"):
         await _react(cmd)
-    if (cmd.command == "!amogus"):
-        await _amogus(cmd)
-    # if (cmd.command == "!joinvoice"): #broken rn, also idk how to leave voice
-    #     await _join_voice(cmd)
 
 async def _say(cmd: Command):
     help_str=f"Need exactly two arguments: {cmd.command} <id of channel to send message to> <message>"
@@ -75,14 +71,3 @@ async def _react(cmd: Command):
         await target_message.add_reaction(host_react)
     else:
         await cmd.channel.send(help_str)
-
-async def _amogus(cmd: Command):
-    await cmd.channel.send("ඞ")
-    # await cmd.channel.send("https://tenor.com/view/boiled-soundcloud-boiled-boiled-irl-boiled-utsc-boiled-cheesestick-agem-soundcloud-gif-20049996")
-
-# async def _join_voice(cmd: Command):
-#     help_str=f"Need the command issuer ({cmd.author_name}) to be connected to the voice channel of interest."
-#     if cmd.author.voice:
-#         await cmd.author.voice.channel.connect()
-#     else:
-#         await cmd.channel.send(help_str)

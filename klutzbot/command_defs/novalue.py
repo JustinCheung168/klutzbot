@@ -17,8 +17,13 @@ KEYWORD_MAP = {
     "birthday": "🎉",
     "zibu": "❤️",
     "futaba": "❤️",
-    "league": "🤓"
 }
+
+# These words will never trigger an automatic reaction with custom server-specific emoji reacts.
+CUSTOM_BLACKLIST = [
+    "lmao",
+]
+
 async def novalue_react(message: discord.Message, client: discord.Client, custom_emoji_names: dict[str,discord.Emoji]):
     """
     React in a nondescript way based on what was said
@@ -29,7 +34,7 @@ async def novalue_react(message: discord.Message, client: discord.Client, custom
         word = raw_word.lower()
         # Check if the word is in the name of a custom emoji; if so, react with that emoji.
         for custom_emoji_name in custom_emoji_names.keys():
-            if word in custom_emoji_name.split("_"):
+            if word in custom_emoji_name.split("_") and word not in CUSTOM_BLACKLIST:
                 await msg.message.add_reaction(custom_emoji_names[custom_emoji_name])
                 break
         # Otherwise, go based on the manually defined keywords

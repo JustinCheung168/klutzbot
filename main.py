@@ -46,7 +46,8 @@ async def on_message(message: discord.Message):
     # Shame Slackbot
     if message.author.name == "YAGPDB.xyz":
         await klutzbot.command_defs.novalue.shame_slackbot(message, client)
-    else:
+    # Michael's requested no-value-added reacts
+    elif message.author.name == "firemike":
         await klutzbot.command_defs.novalue.novalue_react(message, client, custom_emoji_names[message.guild])
 
     if len(message.content) > 0:
