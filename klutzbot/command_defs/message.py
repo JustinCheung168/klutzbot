@@ -13,12 +13,11 @@ class Message():
         self.author_name = self.author.name
         self.guild = message.guild
 
-async def shame_slackbot(msg: Message):
+async def shame(msg: Message):
     """
-    Shame Slackbot
+    Shame the message sender
     """
-    if msg.author.name == "YAGPDB.xyz":
-        await msg.message.add_reaction("🍅")
+    await msg.message.add_reaction("🍅")
 
 async def novalue_react(msg: Message, custom_emoji_names: dict):
     """

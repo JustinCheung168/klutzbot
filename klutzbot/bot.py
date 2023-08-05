@@ -12,6 +12,7 @@ import klutzbot.command_defs.react
 class Bot:
 
     owner = "klutzeh"
+    cmd_start = klutzbot.command_defs.command.Command.start
 
     def __init__(self):
         """Collection of data and connections specific to this bot."""
@@ -53,11 +54,11 @@ class Bot:
     async def respond_to_message(self, message: discord.Message):
         msg = klutzbot.command_defs.message.Message(message, self.client)
 
-        # Shame Slackbot
-        if msg.author.name == "YAGPDB.xyz":
-            await klutzbot.command_defs.message.shame_slackbot(msg)
+        # Automatically shame a user (Slackbot)
+        if msg.author.name in ["YAGPDB.xyz"]:
+            await klutzbot.command_defs.message.shame(msg)
         # Michael's requested no-value-added reacts
-        if msg.author.name == "firemike" or msg.author.name == self.owner:
+        if msg.author.name in [self.owner, "firemike"]:
             await klutzbot.command_defs.message.novalue_react(msg, self.guild_infos[msg.guild].custom_emoji_names)
  
     async def execute_command(self, message: discord.Message):
@@ -69,11 +70,12 @@ class Bot:
         cmd = klutzbot.command_defs.command.Command(message, self.client)
         
         # Interpret specific commands
-        if (cmd.command == "!say") and (cmd.author_name == self.owner):
+        # New commands should be added here
+        if (cmd.command == "say") and (cmd.author_name in [self.owner]):
             await klutzbot.command_defs.command.say(cmd)
-        if (cmd.command == "!reply") and (cmd.author_name == self.owner):
+        if (cmd.command == "reply") and (cmd.author_name in [self.owner]):
             await klutzbot.command_defs.command.reply(cmd)
-        if (cmd.command == "!react") and (cmd.author_name == self.owner):
+        if (cmd.command == "react") and (cmd.author_name in [self.owner]):
             await klutzbot.command_defs.command.react(cmd)
 
     async def respond_to_react(self, payload: discord.RawReactionActionEvent):
@@ -82,7 +84,7 @@ class Bot:
         """
         reac = klutzbot.command_defs.react.React(payload, self.client)
 
-        if reac.reactor_name == self.owner:
+        if reac.reactor_name in [self.owner]:
             await klutzbot.command_defs.react.mirror_react(reac, self.guild_infos[reac.guild].custom_emoji_names)
             
 

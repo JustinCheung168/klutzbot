@@ -29,7 +29,7 @@ async def on_message(message: discord.Message):
 
     if len(message.content) > 0:
         #Command handling
-        if (message.content[0] == "!"): 
+        if (message.content[0:len(bot.cmd_start)] == bot.cmd_start): 
             await bot.execute_command(message)
         #Non-command message handling
         else: 
