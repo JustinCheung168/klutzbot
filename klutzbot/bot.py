@@ -4,8 +4,8 @@ import os
 import discord
 from dotenv import load_dotenv
 
-import klutzbot.command_defs.message
 import klutzbot.command_defs.command
+import klutzbot.command_defs.message
 import klutzbot.command_defs.react
 
 
@@ -23,7 +23,6 @@ class Bot:
 
         # Extra information to collect
         self.guild_infos: dict[str, GuildInfo] = {}
-
 
     def run(self, cli_args: list[str]):
         """Start the bot."""
@@ -61,7 +60,7 @@ class Bot:
         if msg.author.name in [self.owner, "firemike"]:
             await klutzbot.command_defs.message.novalue_react(msg, self.guild_infos[msg.guild].custom_emoji_names)
  
-    async def execute_command(self, message: discord.Message):
+    async def respond_to_command(self, message: discord.Message):
         """
         Interpret a message as a command.
         Commands are assumed to be formatted as:
@@ -87,7 +86,9 @@ class Bot:
         if reac.reactor_name in [self.owner]:
             await klutzbot.command_defs.react.mirror_react(reac, self.guild_infos[reac.guild].custom_emoji_names)
             
-
+    async def respond_to_embed(self, embed: discord.Embed):
+        if not isinstance(embed.title, discord.embeds._EmptyEmbed):
+            pass
 
 class GuildInfo:
     def __init__(self):

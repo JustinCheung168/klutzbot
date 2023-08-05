@@ -1,5 +1,7 @@
 import discord
+
 import klutzbot.command_defs.message
+
 
 class Command(klutzbot.command_defs.message.Message):
     """

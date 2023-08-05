@@ -30,13 +30,13 @@ async def on_message(message: discord.Message):
     if len(message.content) > 0:
         #Command handling
         if (message.content[0:len(bot.cmd_start)] == bot.cmd_start): 
-            await bot.execute_command(message)
+            await bot.respond_to_command(message)
         #Non-command message handling
         else: 
             await bot.respond_to_message(message)
     #Pure embed handling
-    elif (len(message.embeds) > 0): 
-        pass
+    elif len(message.embeds) > 0:
+        await bot.respond_to_embed(message.embeds[0])
 
 @bot.client.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
