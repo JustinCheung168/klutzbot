@@ -13,61 +13,46 @@ class Message():
         self.author_name = self.author.name
         self.guild = message.guild
 
-class Command(Message):
+async def shame_slackbot(msg: Message):
     """
-    Representation of one command and all its useful properties
+    Shame Slackbot
     """
-    def __init__(self, message: discord.Message, client: discord.Client):
-        super().__init__(message, client)
-        message_split = message.content.split(" ")
-        self.command = message_split[0].lower()
-        if len(message_split) > 0:
-            self.args = message_split[1:]
-        else:
-            self.args = []
-        self.num_args = len(self.args)
+    if msg.author.name == "YAGPDB.xyz":
+        await msg.message.add_reaction("🍅")
 
-async def execute_command(message: discord.Message, client: discord.Client):
+async def novalue_react(msg: Message, custom_emoji_names: dict):
     """
-    Interpret a message as a command.
-    Commands are assumed to be formatted as:
-        !<command name> <arg1> <arg2> <arg3> ...
+    React in a nondescript way based on what was said
     """
-    cmd = Command(message, client)
-    
-    # Interpret specific commands
-    if (cmd.command == "!say") and (cmd.author_name == "klutz"):
-        await _say(cmd)
-    if (cmd.command == "!reply") and (cmd.author_name == "klutz"):
-        await _reply(cmd)
-    if (cmd.command == "!react") and (cmd.author_name == "klutz"):
-        await _react(cmd)
+    for raw_word in msg.message.content.split(" "):
+        word = raw_word.lower()
+        is_in_custom = False
+        # Check if the word is in the name of a custom emoji; if so, react with that emoji.
+        for custom_emoji_name in custom_emoji_names.keys():
+            if word in custom_emoji_name.split("_") and word not in NoValueInfo.CUSTOM_BLACKLIST:
+                is_in_custom = True
+                await msg.message.add_reaction(custom_emoji_names[custom_emoji_name])
+                # break
+        # Otherwise, go based on the manually defined keywords
+        if not is_in_custom and (word in NoValueInfo.KEYWORD_MAP.keys()):
+            for listed_react in NoValueInfo.KEYWORD_MAP[word]:
+                print(listed_react)
+                await msg.message.add_reaction(listed_react)
 
-async def _say(cmd: Command):
-    help_str=f"Need exactly two arguments: {cmd.command} <id of channel to send message to> <message>"
-    if cmd.num_args >= 2:
-        target_channel = cmd.client.get_channel(int(cmd.args[0]))
-        host_message = ' '.join(cmd.args[1:])
-        await target_channel.send(host_message)
-    else:
-        await cmd.channel.send(help_str)
+class NoValueInfo:
 
-async def _reply(cmd: Command):
-    help_str=f"Need exactly three arguments: {cmd.command} <id of channel to send message to> <id of message to reply to> <message>"
-    if cmd.num_args >= 3:
-        target_channel = cmd.client.get_channel(int(cmd.args[0]))
-        target_message = await target_channel.fetch_message(int(cmd.args[1]))
-        host_message = ' '.join(cmd.args[2:])
-        await target_message.channel.send(host_message, reference=target_message)
-    else:
-        await cmd.channel.send(help_str)
+    # Manually curated.
+    KEYWORD_MAP = {
+        "diamond": "💎🙌",
+        "ass": "🍑",
+        "booty": "🍑",
+        "christmas": "🎄",
+        "birthday": "🎉",
+        "zibu": "❤️",
+        "futaba": "❤️",
+    }
 
-async def _react(cmd: Command):
-    help_str=f"Need exactly three arguments: {cmd.command} <id of channel to send message to> <id of message to react to> <message>"
-    if cmd.num_args == 3:
-        target_channel = cmd.client.get_channel(int(cmd.args[0]))
-        target_message = await target_channel.fetch_message(int(cmd.args[1]))
-        host_react = cmd.args[2]
-        await target_message.add_reaction(host_react)
-    else:
-        await cmd.channel.send(help_str)
+    # These words will never trigger an automatic reaction with custom server-specific emoji reacts.
+    CUSTOM_BLACKLIST = [
+        "lmao",
+    ]
