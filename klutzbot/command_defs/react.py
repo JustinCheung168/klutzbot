@@ -20,9 +20,13 @@ class React():
     async def message(self) -> discord.Message:
         return await self.channel.fetch_message(self.message_id)
 
-async def mirror_react(reac: React):
+async def mirror_react(reac: React, custom_emoji_names: dict):
     target_message = await reac.message
-    # print(reac.react)
+    for custom_emoji_name in custom_emoji_names.keys():
+        if reac.react == custom_emoji_name:
+            await target_message.add_reaction(custom_emoji_names[custom_emoji_name])
+            return
     await target_message.add_reaction(reac.react)
+    return
 
 

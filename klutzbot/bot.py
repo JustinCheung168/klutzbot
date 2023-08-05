@@ -83,7 +83,7 @@ class Bot:
         reac = klutzbot.command_defs.react.React(payload, self.client)
 
         if reac.reactor_name == self.owner:
-            await klutzbot.command_defs.react.mirror_react(reac)
+            await klutzbot.command_defs.react.mirror_react(reac, self.guild_infos[reac.guild].custom_emoji_names)
             
 
 
