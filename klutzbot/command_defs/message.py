@@ -1,5 +1,6 @@
 import discord
 
+
 class Message():
     """
     Representation of one message and all its useful properties
