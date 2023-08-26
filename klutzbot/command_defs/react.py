@@ -14,7 +14,8 @@ class React():
         self.reactor_name = self.reactor.name
         self.react = payload.emoji.name
         self.message_id  = payload.message_id
-        self.guild = client.get_guild(payload.guild_id)
+        self.guild_id = payload.guild_id
+        self.guild = client.get_guild(self.guild_id)
 
     @property
     async def message(self) -> discord.Message:

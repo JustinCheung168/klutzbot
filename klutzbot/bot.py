@@ -77,18 +77,21 @@ class Bot:
         if (cmd.command == "react") and (cmd.author_name in [self.owner]):
             await klutzbot.command_defs.command.react(cmd)
 
-    async def respond_to_react(self, payload: discord.RawReactionActionEvent):
+    async def respond_to_react(self, react: discord.RawReactionActionEvent):
         """
         Take any needed actions in response to a react.
         """
-        reac = klutzbot.command_defs.react.React(payload, self.client)
+        rct = klutzbot.command_defs.react.React(react, self.client)
 
-        if reac.reactor_name in [self.owner]:
-            await klutzbot.command_defs.react.mirror_react(reac, self.guild_infos[reac.guild].custom_emoji_names)
+        if rct.reactor_name in [self.owner]:
+            await klutzbot.command_defs.react.mirror_react(rct, self.guild_infos[rct.guild].custom_emoji_names)
             
     async def respond_to_embed(self, embed: discord.Embed):
         if not isinstance(embed.title, discord.embeds._EmptyEmbed):
             pass
+
+    async def enable_teatime(self):
+        """Check if Mudae is active; if so, connect to teatime functionality."""
 
 class GuildInfo:
     def __init__(self):

@@ -9,11 +9,12 @@ class Command(klutzbot.command_defs.message.Message):
     """
 
     start = "!"
+    delim = " "
 
     def __init__(self, message: discord.Message, client: discord.Client):
         super().__init__(message, client)
         # Strip out the start command indicator
-        message_split = message.content[len(self.start):].split(" ")
+        message_split = message.content[len(self.start):].split(self.delim)
         self.command = message_split[0].lower()
         if len(message_split) > 0:
             self.args = message_split[1:]
