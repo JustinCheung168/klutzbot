@@ -70,12 +70,13 @@ class Bot:
         
         # Interpret specific commands
         # New commands should be added here
-        if (cmd.command == "say") and (cmd.author_name in [self.owner]):
-            await klutzbot.command_defs.command.say(cmd)
-        if (cmd.command == "reply") and (cmd.author_name in [self.owner]):
-            await klutzbot.command_defs.command.reply(cmd)
-        if (cmd.command == "react") and (cmd.author_name in [self.owner]):
-            await klutzbot.command_defs.command.react(cmd)
+        await klutzbot.command_defs.command.CommandExecutor.run(cmd)
+        # if (cmd.command == "say") and (cmd.author_name in [self.owner]):
+        #     await klutzbot.command_defs.command.say(cmd)
+        # if (cmd.command == "reply") and (cmd.author_name in [self.owner]):
+        #     await klutzbot.command_defs.command.reply(cmd)
+        # if (cmd.command == "react") and (cmd.author_name in [self.owner]):
+        #     await klutzbot.command_defs.command.react(cmd)
 
     async def respond_to_react(self, react: discord.RawReactionActionEvent):
         """
