@@ -4,16 +4,15 @@ import os
 import discord
 from dotenv import load_dotenv
 
-import klutzbot.command_defs.command
-import klutzbot.command_defs.message
-import klutzbot.command_defs.react
+import klutzbot.general.command
+import klutzbot.general.guild
+import klutzbot.general.message
+import klutzbot.general.react
+import klutzbot.teatime.command
+import klutzbot.teatime.message
 
 
 class Bot:
-
-    owner = "klutzeh"
-    cmd_start = klutzbot.command_defs.command.Command.start
-
     def __init__(self):
         """Collection of data and connections specific to this bot."""
 
@@ -22,7 +21,15 @@ class Bot:
         self.client = discord.Client(intents=self.intents)
 
         # Extra information to collect
-        self.guild_infos: dict[str, GuildInfo] = {}
+        self.guild_infos = klutzbot.general.guild.AllGuildInfos()
+
+        # Handlers for message response and command running
+        self.general_cmd_runner = klutzbot.general.command.GeneralCommandRunner()
+        self.general_msg_responder = klutzbot.general.message.GeneralMessageResponder()
+        self.general_rct_responder = klutzbot.general.react.GeneralReactResponder()
+
+        self.tt_cmd_runner = klutzbot.teatime.command.TTCommandRunner()
+        self.tt_msg_responder = klutzbot.teatime.message.TTMessageResponder()
 
     def run(self, cli_args: list[str]):
         """Start the bot."""
@@ -41,64 +48,48 @@ class Bot:
         # Use this token to connect the bot to the client.
         self.client.run(token)
         return
-    
+
     def on_ready(self):
-        print(f'{self.client.user.name} is connected to Discord!')
+        print(f"{self.client.user.name} is connected to Discord!")
         for guild in self.client.guilds:
-            print(f'Connected to {guild.name}')
+            print(f"Connected to {guild.name}")
             # Collect info about each guild
-            self.guild_infos[guild] = GuildInfo()
-            self.guild_infos[guild].collect(guild)   
+            self.guild_infos.add_guild_info(guild)
 
     async def respond_to_message(self, message: discord.Message):
-        msg = klutzbot.command_defs.message.Message(message, self.client)
+        """ """
 
-        # Automatically shame a user (Slackbot)
-        if msg.author.name in ["YAGPDB.xyz"]:
-            await klutzbot.command_defs.message.shame(msg)
-        # Michael's requested no-value-added reacts
-        if msg.author.name in [self.owner, "firemike"]:
-            await klutzbot.command_defs.message.novalue_react(msg, self.guild_infos[msg.guild].custom_emoji_names)
- 
-    async def respond_to_command(self, message: discord.Message):
-        """
-        Interpret a message as a command.
-        Commands are assumed to be formatted as:
-            !<command name> <arg1> <arg2> <arg3> ...
-        """
-        cmd = klutzbot.command_defs.command.Command(message, self.client)
-        
-        # Interpret specific commands
-        # New commands should be added here
-        await klutzbot.command_defs.command.CommandExecutor.run(cmd)
-        # if (cmd.command == "say") and (cmd.author_name in [self.owner]):
-        #     await klutzbot.command_defs.command.say(cmd)
-        # if (cmd.command == "reply") and (cmd.author_name in [self.owner]):
-        #     await klutzbot.command_defs.command.reply(cmd)
-        # if (cmd.command == "react") and (cmd.author_name in [self.owner]):
-        #     await klutzbot.command_defs.command.react(cmd)
+        # Decide if the message is a command, and if so, what kind of command.
+        # Commands are assumed to be formatted as:
+        #     <start string><command name> <arg1> <arg2> <arg3> ...
+        # General command handling
+        if (
+            message.content[: len(klutzbot.general.command.GeneralCommand.START)]
+            == klutzbot.general.command.GeneralCommand.START
+        ):
+            cmd = klutzbot.general.command.GeneralCommand(
+                message, self.client, self.guild_infos
+            )
+            await self.general_cmd_runner.run(cmd)
+        # Teatime bot functionality is provided using Mudae's command start character
+        elif (
+            message.content[: len(klutzbot.teatime.command.TTCommand.START)]
+            == klutzbot.teatime.command.TTCommand.START
+        ):
+            cmd = klutzbot.teatime.command.TTCommand(
+                message, self.client, self.guild_infos
+            )
+            await self.tt_cmd_runner.run(cmd)
+        else:
+            msg = klutzbot.general.message.Message(
+                message, self.client, self.guild_infos
+            )
+            await self.general_msg_responder.respond(msg)
+            await self.tt_msg_responder.respond(msg)
 
     async def respond_to_react(self, react: discord.RawReactionActionEvent):
         """
         Take any needed actions in response to a react.
         """
-        rct = klutzbot.command_defs.react.React(react, self.client)
-
-        if rct.reactor_name in [self.owner]:
-            await klutzbot.command_defs.react.mirror_react(rct, self.guild_infos[rct.guild].custom_emoji_names)
-            
-    async def respond_to_embed(self, embed: discord.Embed):
-        if not isinstance(embed.title, discord.embeds._EmptyEmbed):
-            pass
-
-    async def enable_teatime(self):
-        """Check if Mudae is active; if so, connect to teatime functionality."""
-
-class GuildInfo:
-    def __init__(self):
-        """Guild-specific information collection"""
-        self.custom_emoji_names: dict[str, discord.Emoji] = {}
-        
-    def collect(self, guild: discord.Guild):
-        self.custom_emoji_names = {emoji.name:emoji for emoji in guild.emojis}
-
+        rct = klutzbot.general.react.React(react, self.client, self.guild_infos)
+        await rct.respond()
