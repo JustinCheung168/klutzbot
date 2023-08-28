@@ -16,9 +16,9 @@ class Interface:
         aliases: list[str],
         description: str = "No description available",
         n_args: int = 0,
-        arg_descs: list[str] | None = None,
+        arg_descs: list[str] = None,
         more_args_allowed: bool = False,
-        authorized_users_wl: set[str] | None = None,
+        authorized_users_wl: set[str] = None,
         hide_help: bool = False,
     ):
         self.implementation = implementation
